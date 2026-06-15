@@ -92,8 +92,8 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--bg);color:var(--text)
 
 /* CALENDÁRIO */
 .cal-wrap{flex:1;overflow:auto;padding:20px;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column}
-.calendar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh);flex:1;display:flex;flex-direction:column}
-.cal-head{display:grid;background:var(--bg);border-bottom:1.5px solid var(--border);flex-shrink:0}
+.calendar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow-y:auto;overflow-x:hidden;box-shadow:var(--sh);flex:1;display:flex;flex-direction:column}
+.cal-head{display:grid;background:var(--bg);border-bottom:1.5px solid var(--border);flex-shrink:0;position:sticky;top:0;z-index:5}
 .g7{grid-template-columns:repeat(7,1fr)}
 .g2{grid-template-columns:56px 1fr}
 .head-cell{padding:13px 8px;text-align:center;font-size:11px;font-weight:800;color:var(--faint);letter-spacing:.07em;text-transform:uppercase;border-right:1px solid var(--border)}
@@ -144,6 +144,10 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--bg);color:var(--text)
 .c-Nathalia{background:var(--nathalia-bg);color:var(--nathalia);border-color:#F48FB1}
 .chip-done{opacity:.5;text-decoration:line-through}
 .chip-overdue{border-color:#DC2626!important;box-shadow:inset 2px 0 0 #DC2626}
+.chip-multi{background:#EFECFF;color:#5B21B6;border-color:#D8D2FF}
+.chip-avatars{display:flex;flex-shrink:0;margin-left:4px}
+.chip-avatar{width:15px;height:15px;border-radius:50%;font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center;border:1.5px solid #fff;margin-left:-5px;flex-shrink:0}
+.chip-avatar:first-child{margin-left:0}
 .more-tag{font-size:11px;color:var(--faint);font-weight:700;padding:0 3px}
 
 /* Horário no chip do mês */
@@ -420,7 +424,7 @@ function fromRow(r){
 const MEMBERS=[{name:'Lucas',role:'Gestor',bg:'#E0F7FA',color:'#0077B6'},{name:'Joaquim',role:'Repórter',bg:'#E8F5E9',color:'#388E3C'},{name:'Nathalia',role:'Repórter',bg:'#FCE4EC',color:'#C2185B'}];
 const DAYS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-const HOURS=[7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+const HOURS=[5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22];
 
 // ── ESCAPE (segurança / busca) ────────────────────────────────
 function escHtml(s){
@@ -441,18 +445,17 @@ function localDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart
 const TODAY=localDate(new Date());
 function weekStart(d){const c=new Date(d);c.setDate(c.getDate()-c.getDay());return c;}
 function visible(){
-  // Expande tarefas com múltiplos membros: gera uma entrada por membro
-  let expanded=[];
-  tasks.forEach(t=>{
-    const members=t.members||[t.member];
-    members.forEach(m=>{
-      expanded.push({...t, member:m, members});
-    });
-  });
-  // Remove duplicatas de id+membro
-  const seen=new Set();
-  expanded=expanded.filter(t=>{const k=t.id+t.member;if(seen.has(k))return false;seen.add(k);return true;});
-  let result=filter==='all'?expanded:expanded.filter(t=>t.member===filter);
+  let result;
+  if(filter==='all'){
+    // Uma entrada por tarefa — independente de quantos responsáveis ela tenha
+    result=tasks.map(t=>({...t, members:t.members||[t.member]}));
+  }else{
+    // Filtrando por uma pessoa: só as tarefas em que ela está envolvida,
+    // coloridas com a cor dela
+    result=tasks
+      .filter(t=>(t.members||[t.member]).includes(filter))
+      .map(t=>({...t, member:filter, members:t.members||[t.member]}));
+  }
   if(searchQuery) result=result.filter(t=>t.title.toLowerCase().includes(searchQuery.toLowerCase()));
   return result;
 }
@@ -466,21 +469,33 @@ function highlightTitle(t){
   if(!searchQuery) return safe;
   return safe.replace(new RegExp('('+escRegExp(escHtml(searchQuery))+')','gi'),'<mark class="search-highlight">$1</mark>');
 }
+// Quando a tarefa tem mais de um responsável e estamos em "Todos", mostra
+// um único chip neutro com as iniciais de cada pessoa, em vez de repetir
+// o mesmo chip uma vez por pessoa.
+function isMulti(t){
+  return filter==='all'&&(t.members||[t.member]).length>1;
+}
+function memberBadges(t){
+  return '<span class="chip-avatars">'+(t.members||[t.member]).map(m=>{
+    const initials=escHtml((memberLabels[m]||m).slice(0,2).toUpperCase());
+    return '<span class="chip-avatar c-'+m+'" title="'+escHtml(memberLabels[m]||m)+'">'+initials+'</span>';
+  }).join('')+'</span>';
+}
 function chipWeek(t){
-  const done=t.status==='concluida';
-  const cls='chip-week c-'+t.member+(done?' chip-done':'')+(isOverdue(t)?' chip-overdue':'');
-  return '<div class="'+cls+'" data-task="'+t.id+'">'+priDot(t.priority)+'<span class="chip-txt">'+highlightTitle(t)+'</span></div>';
+  const done=t.status==='concluida',multi=isMulti(t);
+  const cls='chip-week '+(multi?'chip-multi':'c-'+t.member)+(done?' chip-done':'')+(isOverdue(t)?' chip-overdue':'');
+  return '<div class="'+cls+'" data-task="'+t.id+'">'+priDot(t.priority)+'<span class="chip-txt">'+highlightTitle(t)+'</span>'+(multi?memberBadges(t):'')+'</div>';
 }
 function chipMonth(t){
-  const done=t.status==='concluida';
-  const cls='chip c-'+t.member+(done?' chip-done':'')+(isOverdue(t)?' chip-overdue':'');
+  const done=t.status==='concluida',multi=isMulti(t);
+  const cls='chip '+(multi?'chip-multi':'c-'+t.member)+(done?' chip-done':'')+(isOverdue(t)?' chip-overdue':'');
   const timeStr=t.time?'<span class="chip-time">'+t.time.slice(0,5)+'</span>':'';
-  return '<div class="'+cls+'" data-task="'+t.id+'">'+priDot(t.priority)+'<span class="chip-txt">'+highlightTitle(t)+'</span>'+timeStr+'</div>';
+  return '<div class="'+cls+'" data-task="'+t.id+'">'+priDot(t.priority)+'<span class="chip-txt">'+highlightTitle(t)+'</span>'+(multi?memberBadges(t):'')+timeStr+'</div>';
 }
 function chipDay(t){
-  const done=t.status==='concluida';
-  const cls='chip c-'+t.member+(done?' chip-done':'')+(isOverdue(t)?' chip-overdue':'');
-  return '<div class="'+cls+'" data-task="'+t.id+'">'+priDot(t.priority)+'<span class="chip-txt">'+highlightTitle(t)+'</span></div>';
+  const done=t.status==='concluida',multi=isMulti(t);
+  const cls='chip '+(multi?'chip-multi':'c-'+t.member)+(done?' chip-done':'')+(isOverdue(t)?' chip-overdue':'');
+  return '<div class="'+cls+'" data-task="'+t.id+'">'+priDot(t.priority)+'<span class="chip-txt">'+highlightTitle(t)+'</span>'+(multi?memberBadges(t):'')+'</div>';
 }
 
 function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
@@ -844,7 +859,7 @@ function buildMemberPills(){
   el.querySelectorAll('.member-pill').forEach(p=>p.addEventListener('click',()=>{
     const name=p.dataset.member;
     if(selMembers.includes(name)){
-      if(selMembers.length>1) selMembers=selMembers.filter(x=>x!==name); // mínimo 1
+      selMembers=selMembers.filter(x=>x!==name);
     } else {
       selMembers=[...selMembers,name];
     }
@@ -858,9 +873,9 @@ function openModal(task,date,time){
   editing=task||null;
   // Suporta tanto members (array) quanto member (string legado)
   if(task){
-    selMembers=task.members||[task.member]||['Lucas'];
+    selMembers=task.members||[task.member]||[];
   } else {
-    selMembers=[MEMBERS[0]?.name||'Lucas'];
+    selMembers=[];
   }
   selPri=task?.priority||'media';
   selStatus=task?.status||'pendente';
@@ -885,6 +900,7 @@ document.querySelectorAll('[data-status]').forEach(el=>el.addEventListener('clic
 document.getElementById('saveBtn').addEventListener('click',async()=>{
   const title=document.getElementById('fTitle').value.trim();
   if(!title){document.getElementById('fTitle').focus();return;}
+  if(!selMembers.length){showToast('Selecione pelo menos um responsável');return;}
   const btn=document.getElementById('saveBtn');
   btn.disabled=true;btn.textContent='Salvando...';
   const data={title,members:selMembers,member:selMembers[0],priority:selPri,status:selStatus,date:document.getElementById('fDate').value,time:document.getElementById('fTime').value,desc:document.getElementById('fDesc').value};
