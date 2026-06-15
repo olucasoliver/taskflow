@@ -9,14 +9,14 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#F7F8FA;--surface:#FFFFFF;--border:#E4E0F5;--border-md:#CEC8EE;
+  --bg:#F7F8FA;--surface:#FFFFFF;--border:#E4E0F5;--border-md:#C7BFFF;
   --text:#1A1635;--muted:#6E6898;--faint:#A8A3C8;
-  --accent:#5B5BD6;--accent2:#7C3AED;--accent-light:#EEECFF;
+  --accent:#4F2DD6;--accent2:#7C3AED;--accent-light:#EFECFF;
   --r:12px;--r-lg:18px;--r-xl:24px;
   --sh:0 2px 16px rgba(60,40,160,.09);--sh-lg:0 8px 40px rgba(60,40,160,.15);
-  --lucas-bg:#E0F7FA;--lucas:#0077B6;
-  --joaquim-bg:#E8F5E9;--joaquim:#388E3C;
-  --nathalia-bg:#FCE4EC;--nathalia:#C2185B;
+  --lucas-bg:#B3ECF5;--lucas:#005A82;
+  --joaquim-bg:#C5EFC8;--joaquim:#256429;
+  --nathalia-bg:#F9C2D6;--nathalia:#9C1352;
 }
 body{font-family:'Nunito Sans',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;-webkit-text-size-adjust:100%}
 
@@ -78,8 +78,8 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--bg);color:var(--text)
 .search-clear.visible{display:flex}
 .search-clear:hover{color:var(--text)}
 
-.today-btn{padding:7px 13px;border-radius:9px;border:1.5px solid var(--border-md);background:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:var(--muted);transition:all .15s;white-space:nowrap}
-.today-btn:hover{background:var(--bg);color:var(--text)}
+.today-btn{padding:7px 13px;border-radius:9px;border:1.5px solid var(--border-md);background:var(--accent-light);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:var(--accent);transition:all .15s;white-space:nowrap}
+.today-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 .view-tabs{display:flex;background:var(--bg);border-radius:11px;padding:3px;gap:2px;border:1.5px solid var(--border)}
 .view-tab{background:none;border:none;border-radius:8px;padding:6px 16px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:var(--muted);transition:all .15s;white-space:nowrap}
 .view-tab.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 4px rgba(80,60,180,.1)}
@@ -139,9 +139,9 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--bg);color:var(--text)
 .chip-week{display:flex;align-items:center;gap:4px;border-radius:5px;padding:2px 5px;font-size:11px;font-weight:700;cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;border:1px solid transparent;flex-shrink:0;width:100%}
 .chip-week:hover{filter:brightness(.95)}
 .chip-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-.c-Lucas{background:var(--lucas-bg);color:var(--lucas);border-color:#80DEEA}
-.c-Joaquim{background:var(--joaquim-bg);color:var(--joaquim);border-color:#A5D6A7}
-.c-Nathalia{background:var(--nathalia-bg);color:var(--nathalia);border-color:#F48FB1}
+.c-Lucas{background:var(--lucas-bg);color:var(--lucas);border-color:#4DD0E1}
+.c-Joaquim{background:var(--joaquim-bg);color:var(--joaquim);border-color:#66BB6A}
+.c-Nathalia{background:var(--nathalia-bg);color:var(--nathalia);border-color:#EC407A}
 .chip-done{opacity:.5;text-decoration:line-through}
 .chip-overdue{border-color:#DC2626!important;box-shadow:inset 2px 0 0 #DC2626}
 .chip-multi{background:#EFECFF;color:#5B21B6;border-color:#D8D2FF}
@@ -314,12 +314,12 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--bg);color:var(--text)
         <div class="stat-row"><span class="stat-label">⏳ Em andamento</span><span class="stat-val" style="color:#1D4ED8" id="s-and">0</span></div>
         <div class="stat-row"><span class="stat-label">✅ Concluídas</span><span class="stat-val" style="color:#15803D" id="s-conc">0</span></div>
       </div>
-      <button onclick="downloadMonthlyReport()" style="width:100%;margin-top:10px;padding:9px;border-radius:10px;border:1.5px solid var(--border-md);background:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='none'">
+      <button onclick="downloadMonthlyReport()" style="width:100%;margin-top:10px;padding:9px;border-radius:10px;border:1.5px solid var(--border-md);background:var(--accent-light);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--accent);display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s" onmouseover="this.style.background='var(--accent)';this.style.color='#fff'" onmouseout="this.style.background='var(--accent-light)';this.style.color='var(--accent)'">
         📊 Relatório mensal
       </button>
     </div>
     <div style="margin-top:auto;padding:14px">
-      <button onclick="openConfig()" style="width:100%;padding:9px;border-radius:10px;border:1.5px solid var(--border-md);background:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='none'">
+      <button onclick="openConfig()" style="width:100%;padding:9px;border-radius:10px;border:1.5px solid var(--border-md);background:var(--accent-light);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--accent);display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s" onmouseover="this.style.background='var(--accent)';this.style.color='#fff'" onmouseout="this.style.background='var(--accent-light)';this.style.color='var(--accent)'">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         Configurações
       </button>
@@ -421,7 +421,7 @@ function toRow(t){
 function fromRow(r){
   return {id:r.id,title:r.title,members:r.members||[r.member],member:r.member,priority:r.priority,status:r.status,date:r.date,time:r.time||'',desc:r.description||''};
 }
-const MEMBERS=[{name:'Lucas',role:'Gestor',bg:'#E0F7FA',color:'#0077B6'},{name:'Joaquim',role:'Repórter',bg:'#E8F5E9',color:'#388E3C'},{name:'Nathalia',role:'Repórter',bg:'#FCE4EC',color:'#C2185B'}];
+const MEMBERS=[{name:'Lucas',role:'Gestor',bg:'#B3ECF5',color:'#005A82'},{name:'Joaquim',role:'Repórter',bg:'#C5EFC8',color:'#256429'},{name:'Nathalia',role:'Repórter',bg:'#F9C2D6',color:'#9C1352'}];
 const DAYS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const HOURS=[5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22];
@@ -989,16 +989,16 @@ document.getElementById('bn-menu').addEventListener('click',openSidebar);
 
 // ── PALETA DE CORES PARA NOVOS MEMBROS ───────────────────────
 const COLOR_PALETTE=[
-  {bg:'#E0F7FA',color:'#0077B6'}, // ciano
-  {bg:'#E8F5E9',color:'#388E3C'}, // verde
-  {bg:'#FCE4EC',color:'#C2185B'}, // rosa
-  {bg:'#EDE7F6',color:'#6A1B9A'}, // roxo
-  {bg:'#FFF3E0',color:'#E65100'}, // laranja
-  {bg:'#E8EAF6',color:'#283593'}, // azul índigo
-  {bg:'#FCE4EC',color:'#880E4F'}, // bordô
-  {bg:'#E0F2F1',color:'#00695C'}, // teal
-  {bg:'#FFF8E1',color:'#F57F17'}, // âmbar
-  {bg:'#FAFAFA',color:'#424242'}, // cinza
+  {bg:'#B3ECF5',color:'#005A82'}, // ciano
+  {bg:'#C5EFC8',color:'#256429'}, // verde
+  {bg:'#F9C2D6',color:'#9C1352'}, // rosa
+  {bg:'#D6C8F5',color:'#5A1A99'}, // roxo
+  {bg:'#FFDDB3',color:'#C04600'}, // laranja
+  {bg:'#C3C8F0',color:'#1F2E80'}, // azul índigo
+  {bg:'#F5B8CC',color:'#6B0B3D'}, // bordô
+  {bg:'#B8E8E4',color:'#004D43'}, // teal
+  {bg:'#FFE9A8',color:'#B8650A'}, // âmbar
+  {bg:'#E0DEDE',color:'#333333'}, // cinza
 ];
 
 // ── PERSISTÊNCIA DE MEMBROS (compartilhada via Supabase) ──────
